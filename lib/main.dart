@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:look_back/domain/presentation/app_theme.dart';
+import 'package:look_back/domain/presentation/screen/initial/initial_screen.dart';
+import 'package:look_back/domain/presentation/screen/initial/initial_state.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => InitialScreenState()),
+      ],
+      child: LookBackApp(),
+    ),
+  );
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class LookBackApp extends StatelessWidget {
+  const LookBackApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      title: 'Lookback',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
+      home: const InitialScreen(),
     );
   }
 }
