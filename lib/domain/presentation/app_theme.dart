@@ -4,47 +4,49 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   AppTheme._();
 
-  static const _darkBackground = Color(0xFF090B14);
-  static const _darkSurface = Color(0xFF111827);
-  static const _darkSurfaceAlt = Color(0xFF1A2338);
+  static const _darkBackground = Color(0xFF121212);
+  static const _darkSurface = Color(0xFF1E1E1E);
+  static const _darkSurfaceAlt = Color(0xFF262626);
 
-  static const _darkPrimary = Color(0xFF7C8CFF);
-  static const _darkPrimaryContainer = Color(0xFF2D3D73);
+  static const _darkPrimary = Color(0xFF4783FB);
+  static const _darkPrimaryContainer = Color(0xFF1F3A73);
 
-  static const _darkSecondary = Color(0xFF8CB8FF);
+  static const _darkSecondary = Color(0xFF297DD2);
 
-  static const _darkOnBackground = Color(0xFFF3F6FF);
-  static const _darkTextSecondary = Color(0xFFA4B0C8);
+  static const _darkOnBackground = Color(0xFFE0E0E0);
+  static const _darkTextSecondary = Color.fromARGB(255, 127, 127, 127);
 
-  static const _darkDivider = Color(0xFF27324A);
+  static const _darkDivider = Color(0xFF2A2A2A);
 
-  static const _darkError = Color(0xFFFF7A8C);
+  static const _darkError = Color(0xFFEF9A9A);
 
-  static const _lightBackground = Color(0xFFF7F9FC);
+  static const _lightBackground = Color(0xFFF5F5F5);
   static const _lightSurface = Color(0xFFFFFFFF);
-  static const _lightSurfaceAlt = Color(0xFFF0F4FA);
+  static const _lightSurfaceAlt = Color(0xFFEDEDED);
 
-  static const _lightPrimary = Color(0xFF536DFE);
-  static const _lightPrimaryContainer = Color(0xFFDDE5FF);
+  static const _lightPrimary = Color.fromARGB(255, 71, 131, 251);
+  static const _lightPrimaryContainer = Color(0xFFDCE7FF);
 
-  static const _lightSecondary = Color(0xFF6C9DFF);
+  static const _lightSecondary = Color.fromARGB(255, 16, 9, 150);
 
-  static const _lightOnBackground = Color(0xFF1B2333);
-  static const _lightTextSecondary = Color(0xFF6D7892);
+  static const _lightOnBackground = Color(0xFF212121);
+  static const _lightTextSecondary = Color.fromARGB(255, 151, 151, 151);
 
-  static const _lightDivider = Color(0xFFE2E8F4);
+  static const _lightDivider = Color(0xFFE0E0E0);
 
-  static const _lightError = Color(0xFFD64A63);
+  static const _lightError = Color(0xFFB71C1C);
 
-  static const waveformActive = Color(0xFF8CB8FF);
-  static const waveformInactive = Color(0x338CB8FF);
+  static const waveformActive = Color(0xFF4783FB);
+  static const waveformInactive = Color(0x334783FB);
 
   static const glowGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF5D73FF), Color(0xFF9CC9FF)],
+    colors: [Color(0xFF4783FB), Color(0xFF297DD2)],
   );
+
   static const double borderRadius = 24;
+
   static TextTheme _textTheme(Color onBackground, Color textSecondary) {
     final display = GoogleFonts.manropeTextTheme();
     final body = GoogleFonts.interTextTheme();
@@ -123,19 +125,20 @@ class AppTheme {
       color: onBackground.withOpacity(0.75),
     );
   }
+
   static ThemeData get light {
     final colorScheme = const ColorScheme.light(
       brightness: Brightness.light,
       primary: _lightPrimary,
-      onPrimary: Colors.white,
+      onPrimary: Color(0xFFFFFFFF),
       primaryContainer: _lightPrimaryContainer,
       onPrimaryContainer: _lightOnBackground,
       secondary: _lightSecondary,
-      onSecondary: Colors.white,
+      onSecondary: _lightTextSecondary,
       surface: _lightSurface,
       onSurface: _lightOnBackground,
       error: _lightError,
-      onError: Colors.white,
+      onError: Color(0xFFFFFFFF),
       outline: _lightDivider,
     );
 
@@ -152,15 +155,15 @@ class AppTheme {
     final colorScheme = const ColorScheme.dark(
       brightness: Brightness.dark,
       primary: _darkPrimary,
-      onPrimary: Color(0xFF090B14),
+      onPrimary: Color(0xFFFFFFFF),
       primaryContainer: _darkPrimaryContainer,
       onPrimaryContainer: Colors.white,
       secondary: _darkSecondary,
-      onSecondary: Color(0xFF090B14),
+      onSecondary: _darkTextSecondary,
       surface: _darkSurface,
       onSurface: _darkOnBackground,
       error: _darkError,
-      onError: Color(0xFF090B14),
+      onError: Color(0xFF000000),
       outline: _darkDivider,
     );
 
@@ -180,8 +183,6 @@ class AppTheme {
     required TextTheme textTheme,
     required Color divider,
   }) {
-    // Campo de texto quase invisível: fundo = background com um leve
-    // clareamento (~3%), quase imperceptível até o usuário focar.
     final fieldFill = Color.alphaBlend(
       colorScheme.onSurface.withOpacity(0.03),
       background,
@@ -260,8 +261,8 @@ class AppTheme {
       ),
 
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: const Color(0xFF5D73FF),
-        foregroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
