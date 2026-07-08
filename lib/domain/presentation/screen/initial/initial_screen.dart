@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:look_back/domain/presentation/app_theme.dart';
+import 'package:look_back/domain/presentation/screen/home/home_screen.dart';
 import 'package:look_back/domain/presentation/screen/initial/initial_state.dart';
 import 'package:provider/provider.dart';
 
@@ -13,16 +13,6 @@ class InitialScreen extends StatefulWidget {
 }
  
 class _InitialScreenState extends State<InitialScreen> {
-  final _nameController = TextEditingController();
-  static const _pageCount = 3;
-  static const _namePageIndex = 2;
- 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
- 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -35,16 +25,27 @@ class _InitialScreenState extends State<InitialScreen> {
               return const Center(child: CircularProgressIndicator());
             }
  
-            final isOnNamePage = state.currentPage == _namePageIndex;
-            final nameFilled = _nameController.text.trim().isNotEmpty;
-            final canProceed = !isOnNamePage || nameFilled;
+            final canProceed = state.canProceed;
  
                 return Column(
                   children: [
                     Expanded(
                       child: PageView(
                         controller: state.pageController,
-                        onPageChanged: state.onPageChanged,
+                        onPageChanged: (page) {
+                          state.handlePageChanged(
+                            page,
+                            onNavigateToHome: () {
+                              if (mounted) {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (context) => const HomeScreen(),
+                                  ),
+                                );
+                              }
+                            },
+                          );
+                        },
                         children: [
                           // Página 1 — apresentação
                           Padding(
@@ -369,7 +370,7 @@ class _InitialScreenState extends State<InitialScreen> {
                                 ),
                                 const SizedBox(height: 32),
                                 TextField(
-                                  controller: _nameController,
+                                  controller: state.nameController,
                                   textCapitalization: TextCapitalization.words,
                                   style: theme.textTheme.titleLarge,
                                   cursorColor: theme.colorScheme.primary,
@@ -433,7 +434,7 @@ class _InitialScreenState extends State<InitialScreen> {
                           Expanded(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(_pageCount, (index) {
+                              children: List.generate(state.pageCount, (index) {
                                 final selected = index == state.currentPage;
  
                                 return AnimatedContainer(
@@ -463,10 +464,17 @@ class _InitialScreenState extends State<InitialScreen> {
                                 onPressed: !canProceed
                                     ? null
                                     : () {
-                                        if (state.currentPage == _namePageIndex) {
-                                        } else {
-                                          state.nextPage();
-                                        }
+                                        state.handlePrimaryAction(
+                                          onNavigateToHome: () {
+                                            if (mounted) {
+                                              Navigator.of(context).pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) => const HomeScreen(),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        );
                                       },
                                 style: FilledButton.styleFrom(
                                   shape: const CircleBorder(),
@@ -475,7 +483,7 @@ class _InitialScreenState extends State<InitialScreen> {
                                   shadowColor: theme.colorScheme.primary.withOpacity(0.4),
                                 ),
                                 child: Icon(
-                                  state.currentPage == _namePageIndex
+                                  state.isOnNamePage
                                       ? Icons.check_rounded
                                       : CupertinoIcons.chevron_forward,
                                 ),

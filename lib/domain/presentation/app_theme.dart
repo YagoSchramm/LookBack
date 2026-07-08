@@ -10,30 +10,21 @@ class AppTheme {
 
   static const _darkPrimary = Color(0xFF4783FB);
   static const _darkPrimaryContainer = Color(0xFF1F3A73);
-
   static const _darkSecondary = Color(0xFF297DD2);
-
   static const _darkOnBackground = Color(0xFFE0E0E0);
   static const _darkTextSecondary = Color.fromARGB(255, 127, 127, 127);
-
   static const _darkDivider = Color(0xFF2A2A2A);
-
   static const _darkError = Color(0xFFEF9A9A);
 
   static const _lightBackground = Color(0xFFF5F5F5);
   static const _lightSurface = Color(0xFFFFFFFF);
   static const _lightSurfaceAlt = Color(0xFFEDEDED);
-
   static const _lightPrimary = Color.fromARGB(255, 71, 131, 251);
   static const _lightPrimaryContainer = Color(0xFFDCE7FF);
-
   static const _lightSecondary = Color.fromARGB(255, 16, 9, 150);
-
   static const _lightOnBackground = Color(0xFF212121);
   static const _lightTextSecondary = Color.fromARGB(255, 151, 151, 151);
-
   static const _lightDivider = Color(0xFFE0E0E0);
-
   static const _lightError = Color(0xFFB71C1C);
 
   static const waveformActive = Color(0xFF4783FB);
