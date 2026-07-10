@@ -12,6 +12,10 @@
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Usamos a câmera para adicionar fotos às suas lembranças.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Usamos sua galeria para adicionar fotos às suas lembranças.</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

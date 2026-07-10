@@ -4,14 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-/// iOS (ios/Runner/Info.plist), adicione:
-///   <key>NSCameraUsageDescription</key>
-///   <string>Usamos a câmera para adicionar fotos às suas lembranças.</string>
-///   <key>NSPhotoLibraryUsageDescription</key>
-///   <string>Usamos sua galeria para adicionar fotos às suas lembranças.</string>
-///
-/// Android (android/app/src/main/AndroidManifest.xml), adicione dentro de <manifest>:
-///   <uses-permission android:name="android.permission.CAMERA" />
+import 'package:look_back/global.dart';
+
 class AddImageField extends StatefulWidget {
   const AddImageField({
     super.key,
@@ -30,7 +24,6 @@ class AddImageField extends StatefulWidget {
  
 class _AddImageFieldState extends State<AddImageField> {
   File? _image;
-  final _picker = ImagePicker();
  
   @override
   void initState() {
@@ -39,14 +32,10 @@ class _AddImageFieldState extends State<AddImageField> {
   }
  
   Future<void> _pickImage(ImageSource source) async {
-    final picked = await _picker.pickImage(
-      source: source,
-      imageQuality: 85,
-      maxWidth: 2000,
-    );
+    final picked = await imageService.pickImage(source);
     if (picked == null) return;
  
-    setState(() => _image = File(picked.path));
+    setState(() => _image = picked);
     widget.onImageSelected?.call(_image);
   }
  
