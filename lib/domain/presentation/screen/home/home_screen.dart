@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:look_back/domain/presentation/components/add_image_container.dart';
 import 'package:look_back/domain/presentation/components/audio_memory_card.dart';
 import 'package:look_back/domain/presentation/components/image_memory_card.dart';
+import 'package:look_back/domain/presentation/components/location_memory_card.dart';
 import 'package:look_back/domain/presentation/components/text_memory_card.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -255,6 +257,16 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 AudioMemoryCard(
                   time: '8:15 PM',
+                  onTap: () {
+                    // Handle tap event
+                  },
+                ),
+                        const SizedBox(height: 12),
+                LocationMemoryCard(
+                  latitude: 37.7749,
+                  longitude: -122.4194,
+                  locationName: 'Central Park, New York',
+                  time: '9:00 PM',
                   onTap: () {
                     // Handle tap event
                   },
