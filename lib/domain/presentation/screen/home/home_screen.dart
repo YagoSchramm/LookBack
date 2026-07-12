@@ -1,11 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:look_back/domain/presentation/components/add_image_container.dart';
-import 'package:look_back/domain/presentation/components/audio_memory_card.dart';
-import 'package:look_back/domain/presentation/components/image_memory_card.dart';
-import 'package:look_back/domain/presentation/components/location_memory_card.dart';
-import 'package:look_back/domain/presentation/components/text_memory_card.dart';
-import 'package:provider/provider.dart';
+import 'package:look_back/domain/presentation/components/add_containers/add_location_container.dart';
+import 'package:look_back/domain/presentation/components/memory_cards/audio_memory_card.dart';
+import 'package:look_back/domain/presentation/components/memory_cards/image_memory_card.dart';
+import 'package:look_back/domain/presentation/components/memory_cards/location_memory_card.dart';
+import 'package:look_back/domain/presentation/components/memory_cards/text_memory_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
