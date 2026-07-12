@@ -148,7 +148,6 @@ class _LocationMemoryCardState extends State<LocationMemoryCard> {
                                 urlTemplate:
                                     "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                                       userAgentPackageName: "com.example.look_back",
-
                               ),
                               MarkerLayer(
                                 markers: [
