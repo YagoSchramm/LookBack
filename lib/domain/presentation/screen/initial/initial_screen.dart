@@ -5,14 +5,21 @@ import 'package:look_back/domain/presentation/screen/initial/initial_state.dart'
 import 'package:provider/provider.dart';
 
 
-class InitialScreen extends StatefulWidget {
+class InitialScreen extends StatelessWidget {
   const InitialScreen({super.key});
- 
+
   @override
-  State<InitialScreen> createState() => _InitialScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => InitialScreenState(),
+      child: const InitialScreenContent(),
+    );
+  }
 }
- 
-class _InitialScreenState extends State<InitialScreen> {
+
+class InitialScreenContent extends StatelessWidget {
+  const InitialScreenContent({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -36,18 +43,16 @@ class _InitialScreenState extends State<InitialScreen> {
                           state.handlePageChanged(
                             page,
                             onNavigateToHome: () {
-                              if (mounted) {
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
                                     builder: (context) => const HomeScreen(),
                                   ),
                                 );
-                              }
+                              
                             },
                           );
                         },
                         children: [
-                          // Página 1 — apresentação
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 32),
                             child: Column(
@@ -393,7 +398,7 @@ class _InitialScreenState extends State<InitialScreen> {
                                       ),
                                     ),
                                   ),
-                                  onChanged: (_) => setState(() {}),
+                                  onChanged: (_) => state.notifyListeners(),
                                   onSubmitted: (_) {
                                   
                                   },

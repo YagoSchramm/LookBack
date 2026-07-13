@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:look_back/domain/presentation/app_theme.dart';
 import 'package:look_back/domain/presentation/screen/initial/initial_screen.dart';
-import 'package:look_back/domain/presentation/screen/initial/initial_state.dart';
-import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => InitialScreenState()),
-      ],
-      child: LookBackApp(),
-    ),
-  );
+  runApp(const LookBackApp());
 }
 
 class LookBackApp extends StatelessWidget {
