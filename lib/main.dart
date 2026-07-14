@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:look_back/domain/presentation/app_theme.dart';
-import 'package:look_back/domain/presentation/screen/initial/initial_screen.dart';
+import 'package:look_back/domain/presentation/screen/navigate_page/navigate_page_screen.dart';
 
 void main() {
   runApp(const LookBackApp());
@@ -17,7 +17,7 @@ class LookBackApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      home: const InitialScreen(),
+      home: const NavigatePageScreen(),
     );
   }
 }
