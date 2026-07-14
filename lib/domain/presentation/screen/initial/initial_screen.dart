@@ -471,13 +471,12 @@ class InitialScreenContent extends StatelessWidget {
                                     : () {
                                         state.handlePrimaryAction(
                                           onNavigateToHome: () {
-                                            if (mounted) {
                                               Navigator.of(context).pushReplacement(
                                                 MaterialPageRoute(
                                                   builder: (context) => const HomeScreen(),
                                                 ),
                                               );
-                                            }
+                            
                                           },
                                         );
                                       },

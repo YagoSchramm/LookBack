@@ -163,7 +163,7 @@ class _AddLocationContainerState extends State<AddLocationContainer> {
               )
             else
               Text(
-                'Nenhuma localização',
+                'Localização',
                 style: TextStyle(
                   fontSize: 14,
                   color: theme.colorScheme.onSurface.withOpacity(0.4),
