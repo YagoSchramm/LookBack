@@ -5,6 +5,7 @@ import 'package:look_back/domain/presentation/components/memory_cards/audio_memo
 import 'package:look_back/domain/presentation/components/memory_cards/image_memory_card.dart';
 import 'package:look_back/domain/presentation/components/memory_cards/location_memory_card.dart';
 import 'package:look_back/domain/presentation/components/memory_cards/text_memory_card.dart';
+import 'package:look_back/domain/presentation/screen/register_memory/register_memory_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -155,7 +156,13 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterMemoryScreen(),
+                      ),
+                    );
+                  },
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(

@@ -13,37 +13,37 @@ class AddImageField extends StatefulWidget {
     this.initialImage,
     this.label = 'Adicionar foto',
   });
- 
+
   final ValueChanged<File?>? onImageSelected;
   final File? initialImage;
   final String label;
- 
+
   @override
   State<AddImageField> createState() => _AddImageFieldState();
 }
- 
+
 class _AddImageFieldState extends State<AddImageField> {
   File? _image;
- 
+
   @override
   void initState() {
     super.initState();
     _image = widget.initialImage;
   }
- 
+
   Future<void> _pickImage(ImageSource source) async {
     final picked = await imageService.pickImage(source);
     if (picked == null) return;
- 
+
     setState(() => _image = picked);
     widget.onImageSelected?.call(_image);
   }
- 
+
   void _removeImage() {
     setState(() => _image = null);
     widget.onImageSelected?.call(null);
   }
- 
+
   void _openSourceSheet(BuildContext context) {
     showCupertinoModalPopup<void>(
       context: context,
@@ -56,28 +56,14 @@ class _AddImageFieldState extends State<AddImageField> {
               Navigator.pop(context);
               _pickImage(ImageSource.camera);
             },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(CupertinoIcons.photo_on_rectangle),
-                SizedBox(width: 8),
-                Text('Tirar foto'),
-              ],
-            ),
+            child: Text('Tirar foto'),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
               _pickImage(ImageSource.gallery);
             },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(CupertinoIcons.photo),
-                SizedBox(width: 8),
-                Text('Escolher da galeria'),
-              ],
-            ),
+            child: Text('Escolher da galeria'),
           ),
           if (_image != null)
             CupertinoActionSheetAction(
@@ -86,14 +72,7 @@ class _AddImageFieldState extends State<AddImageField> {
                 Navigator.pop(context);
                 _removeImage();
               },
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(CupertinoIcons.trash),
-                  SizedBox(width: 8),
-                  Text('Remover foto'),
-                ],
-              ),
+              child: Text('Remover foto'),
             ),
         ],
         cancelButton: CupertinoActionSheetAction(
@@ -103,11 +82,11 @@ class _AddImageFieldState extends State<AddImageField> {
       ),
     );
   }
- 
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
- 
+
     return GestureDetector(
       onTap: () => _openSourceSheet(context),
       child: Container(
