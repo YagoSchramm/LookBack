@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:look_back/domain/presentation/components/add_containers/add_location_container.dart';
 import 'package:look_back/domain/presentation/components/memory_cards/audio_memory_card.dart';
 import 'package:look_back/domain/presentation/components/memory_cards/image_memory_card.dart';
 import 'package:look_back/domain/presentation/components/memory_cards/location_memory_card.dart';
