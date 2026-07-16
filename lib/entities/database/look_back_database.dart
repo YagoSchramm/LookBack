@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 import 'tables/memory_table.dart';
+import 'tables/user_table.dart';
 
 class LookBackDatabase {
   // Construtor privado para singleton
@@ -33,6 +34,7 @@ class LookBackDatabase {
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute(MemoryTable.createMemoryTable());
+    await db.execute(UserTable.createUserTable());
   }
 
   /// Fecha a conexão com o banco de dados
