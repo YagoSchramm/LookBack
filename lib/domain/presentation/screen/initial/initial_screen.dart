@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:look_back/domain/presentation/screen/home/home_screen.dart';
 import 'package:look_back/domain/presentation/screen/initial/initial_state.dart';
+import 'package:look_back/entities/models/user.dart';
+import 'package:look_back/global.dart';
 import 'package:provider/provider.dart';
 
 
@@ -23,7 +25,61 @@ class InitialScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
- 
+
+    Future<void> saveUserAndNavigate() async {
+      if (context.mounted) {
+        final state = context.read<InitialScreenState>();
+        state.isLoading = true;
+        state.notifyListeners();
+      }
+
+      try {
+        final state = context.read<InitialScreenState>();
+        final existingUsers = await storageService.listAllUsers();
+        final name = state.nameController.text.trim().isNotEmpty
+            ? state.nameController.text.trim()
+            : 'Usuário';
+        final memoriesCount = await storageService.countMemories();
+
+        final user = User(
+          id: existingUsers?.isNotEmpty == true ? existingUsers!.first.id : null,
+          name: name,
+          memoriesCount: memoriesCount,
+          hasCompletedOnboarding: true,
+          createdAt: existingUsers?.isNotEmpty == true
+              ? existingUsers!.first.createdAt
+              : DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        if (existingUsers != null && existingUsers.isNotEmpty) {
+          await storageService.updateUser(user);
+        } else {
+          await storageService.createUser(user);
+        }
+
+        if (context.mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+      } catch (_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Não foi possível salvar suas informações.'),
+            ),
+          );
+        }
+      } finally {
+        if (context.mounted) {
+          final state = context.read<InitialScreenState>();
+          state.isLoading = false;
+          state.notifyListeners();
+        }
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Consumer<InitialScreenState>(
@@ -42,13 +98,8 @@ class InitialScreenContent extends StatelessWidget {
                         onPageChanged: (page) {
                           state.handlePageChanged(
                             page,
-                            onNavigateToHome: () {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (context) => const HomeScreen(),
-                                  ),
-                                );
-                              
+                            onNavigateToHome: () async {
+                              await saveUserAndNavigate();
                             },
                           );
                         },
@@ -468,17 +519,12 @@ class InitialScreenContent extends StatelessWidget {
                               child: FilledButton(
                                 onPressed: !canProceed
                                     ? null
-                                    : () {
-                                        state.handlePrimaryAction(
-                                          onNavigateToHome: () {
-                                              Navigator.of(context).pushReplacement(
-                                                MaterialPageRoute(
-                                                  builder: (context) => const HomeScreen(),
-                                                ),
-                                              );
-                            
-                                          },
-                                        );
+                                    : () async {
+                                        if (state.isOnNamePage) {
+                                          await saveUserAndNavigate();
+                                        } else {
+                                          state.nextPage();
+                                        }
                                       },
                                 style: FilledButton.styleFrom(
                                   shape: const CircleBorder(),
