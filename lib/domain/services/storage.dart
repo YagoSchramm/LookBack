@@ -1,4 +1,5 @@
 import 'package:look_back/entities/models/memory.dart';
+import 'package:look_back/entities/models/user.dart';
 
 abstract class StorageService {
   /// Cria uma nova memória no banco de dados
@@ -24,4 +25,25 @@ abstract class StorageService {
 
   /// Limpa todas as memórias do banco de dados
   Future<void> deleteAllMemories();
+
+  /// Cria um novo usuário no banco de dados
+  Future<int> createUser(User user);
+
+  /// Lista todos os usuários
+  Future<List<User>?> listAllUsers();
+
+  /// Busca um usuário pelo ID
+  Future<User?> getUserById(int id);
+
+  /// Atualiza um usuário existente
+  Future<void> updateUser(User user);
+
+  /// Deleta um usuário pelo ID
+  Future<void> deleteUser(int id);
+
+  /// Conta o total de usuários
+  Future<int> countUsers();
+
+  /// Limpa todos os usuários do banco de dados
+  Future<void> deleteAllUsers();
 }
