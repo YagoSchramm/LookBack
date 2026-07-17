@@ -20,6 +20,7 @@ dependencies:
   geocoding: 2.2.2
   sqflite: ^2.3.3
   path: ^1.9.0
+  shared_preferences: ^2.5.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
