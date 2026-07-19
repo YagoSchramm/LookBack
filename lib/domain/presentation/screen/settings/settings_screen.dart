@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:look_back/domain/presentation/screen/settings/settings_state.dart';
+import 'package:look_back/app_state.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -8,7 +8,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SettingsState(),
+      create: (_) => AppState()..loadTheme(),
       child: const SettingsScreenContent(),
     );
   }
@@ -40,8 +40,8 @@ class SettingsScreenContent extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12),
-            Consumer<SettingsState>(
-              builder: (context, settingsState, _) {
+            Consumer<AppState>(
+              builder: (context, state, _) {
                 return Column(
                   children: [
                     Padding(
@@ -70,7 +70,7 @@ class SettingsScreenContent extends StatelessWidget {
                               ).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            child: Consumer<SettingsState>(
+                            child: Consumer<AppState>(
                               builder: (context, state, child) {
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
