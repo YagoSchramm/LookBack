@@ -7,10 +7,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AppState()..loadTheme(),
-      child: const SettingsScreenContent(),
-    );
+    return SettingsScreenContent();
   }
 }
 
