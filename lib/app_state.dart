@@ -11,8 +11,7 @@ class AppState with ChangeNotifier {
 
   Future<void> changeTheme(ThemeMode newTheme) async {
     themeMode = newTheme;
-    await themeService.setThemeMode(newTheme);
-    loadTheme();
     notifyListeners();
+    await themeService.setThemeMode(newTheme);
   }
 }
