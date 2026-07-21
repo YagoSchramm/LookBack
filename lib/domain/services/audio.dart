@@ -1,9 +1,13 @@
 import 'dart:io';
 
 abstract class AudioService {
-  /// Opens the audio picker and returns the selected file.
-  Future<File?> pickAudio();
+  Future<bool> hasPermission();
 
-  /// Opens the device audio picker to select an audio file.
-  Future<File?> pickAudioFromFiles() => pickAudio();
+  Future<String> startRecording();
+
+  Future<String?> stopRecording();
+
+  Future<void> cancelRecording();
+
+  void Function(double amplitude)? onAmplitudeChanged;
 }

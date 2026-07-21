@@ -1,89 +1,71 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:look_back/global.dart';
-
-class AddAudioField extends StatefulWidget {
+class AddAudioField extends StatelessWidget {
   const AddAudioField({
     super.key,
-    this.onAudioSelected,
-    this.initialAudio,
+    required this.onRecord,
+    required this.audioPath,
+    required this.duration,
+    this.onRemove,
     this.label = 'Adicionar áudio',
   });
 
-  final ValueChanged<File?>? onAudioSelected;
-  final File? initialAudio;
+  final VoidCallback onRecord;
+  final VoidCallback? onRemove;
+
+  final String? audioPath;
+  final Duration? duration;
+
   final String label;
 
-  @override
-  State<AddAudioField> createState() => _AddAudioFieldState();
-}
+  String _formatDuration(Duration? duration) {
+    if (duration == null) return "00:00";
 
-class _AddAudioFieldState extends State<AddAudioField> {
-  File? _audio;
+    final minutes = duration.inMinutes
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
 
-  @override
-  void initState() {
-    super.initState();
-    _audio = widget.initialAudio;
+    final seconds = duration.inSeconds
+        .remainder(60)
+        .toString()
+        .padLeft(2, '0');
+
+    return "$minutes:$seconds";
   }
 
-  Future<void> _pickAudio() async {
-    final picked = await audioService.pickAudio();
-    if (picked == null) return;
-
-    setState(() => _audio = picked);
-    widget.onAudioSelected?.call(_audio);
-  }
-
-  void _removeAudio() {
-    setState(() => _audio = null);
-    widget.onAudioSelected?.call(null);
-  }
-
-  void _openSourceSheet(BuildContext context) {
-    showCupertinoModalPopup<void>(
+  void _openSheet(BuildContext context) {
+    showCupertinoModalPopup(
       context: context,
-      builder: (context) => CupertinoActionSheet(
-        title: const Text('Adicionar áudio'),
-        message: const Text('Escolha um áudio para a sua lembrança'),
+      builder: (_) => CupertinoActionSheet(
+        title: const Text("Adicionar áudio"),
+        message: const Text("Escolha uma opção"),
+
         actions: [
+
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.pop(context);
-              _pickAudio();
+              onRecord();
             },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(CupertinoIcons.waveform),
-                SizedBox(width: 8),
-                Text('Escolher áudio'),
-              ],
-            ),
+            child: const Text("Gravar áudio"),
           ),
-          if (_audio != null)
+
+          if (audioPath != null)
             CupertinoActionSheetAction(
               isDestructiveAction: true,
               onPressed: () {
                 Navigator.pop(context);
-                _removeAudio();
+                onRemove?.call();
               },
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(CupertinoIcons.trash),
-                  SizedBox(width: 8),
-                  Text('Remover áudio'),
-                ],
-              ),
+              child: const Text("Remover áudio"),
             ),
         ],
+
         cancelButton: CupertinoActionSheetAction(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: const Text("Cancelar"),
         ),
       ),
     );
@@ -94,14 +76,19 @@ class _AddAudioFieldState extends State<AddAudioField> {
     final theme = Theme.of(context);
 
     return GestureDetector(
-      onTap: () => _openSourceSheet(context),
+      onTap: () => _openSheet(context),
       child: Container(
         margin: const EdgeInsets.only(top: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: theme.colorScheme.onSecondary),
+          border: Border.all(
+            color: theme.colorScheme.onSecondary,
+          ),
         ),
         child: Row(
           children: [
@@ -110,42 +97,42 @@ class _AddAudioFieldState extends State<AddAudioField> {
               color: theme.colorScheme.primary,
               size: 22,
             ),
+
             const SizedBox(width: 12),
+
             Text(
-              widget.label,
+              label,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: theme.colorScheme.onSurface,
               ),
             ),
+
             const Spacer(),
-            if (_audio != null) ...[
-              Expanded(
-                child: Text(
-                  _audio!.path.split(Platform.pathSeparator).last,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.end,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-            ] else
+
+            if (audioPath != null)
               Text(
-                'Nenhum áudio',
+                _formatDuration(duration),
                 style: TextStyle(
                   fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  color: theme.colorScheme.onSurface.withOpacity(.7),
+                ),
+              )
+            else
+              Text(
+                "Nenhum áudio",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: theme.colorScheme.onSurface.withOpacity(.4),
                 ),
               ),
-            const SizedBox(width: 4),
+
+            const SizedBox(width: 8),
+
             Icon(
               CupertinoIcons.chevron_right,
-              color: theme.colorScheme.onSurface.withOpacity(0.4),
+              color: theme.colorScheme.onSurface.withOpacity(.4),
               size: 16,
             ),
           ],

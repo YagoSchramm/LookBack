@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:look_back/domain/presentation/components/add_containers/add_audio_container.dart';
 import 'package:look_back/domain/presentation/components/add_containers/add_image_container.dart';
 import 'package:look_back/domain/presentation/components/add_containers/add_location_container.dart';
+import 'package:look_back/domain/presentation/components/audio_recorder.dart';
 import 'package:look_back/domain/presentation/screen/register_memory/register_memory_state.dart';
 import 'package:provider/provider.dart';
 
@@ -63,7 +64,9 @@ class RegisterMemoryView extends StatelessWidget {
                 children: [
                   Text(
                     'Título',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   TextField(
@@ -71,20 +74,31 @@ class RegisterMemoryView extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: 'Ex.: Passeio no parque',
                       filled: true,
-                      fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.35),
+                      fillColor: theme.colorScheme.surfaceContainerHighest
+                          .withOpacity(0.35),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: theme.colorScheme.outlineVariant.withOpacity(0.5)),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.outlineVariant.withOpacity(
+                            0.5,
+                          ),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.4),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 1.4,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
                     ),
                   ),
                 ],
@@ -95,7 +109,9 @@ class RegisterMemoryView extends StatelessWidget {
                 children: [
                   Text(
                     'Descrição',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   TextField(
@@ -104,20 +120,31 @@ class RegisterMemoryView extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: 'Conte o que aconteceu...',
                       filled: true,
-                      fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.35),
+                      fillColor: theme.colorScheme.surfaceContainerHighest
+                          .withOpacity(0.35),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: theme.colorScheme.outlineVariant.withOpacity(0.5)),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.outlineVariant.withOpacity(
+                            0.5,
+                          ),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.4),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 1.4,
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
                     ),
                   ),
                 ],
@@ -125,11 +152,17 @@ class RegisterMemoryView extends StatelessWidget {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Icon(CupertinoIcons.add_circled, color: theme.colorScheme.primary, size: 20),
+                  Icon(
+                    CupertinoIcons.add_circled,
+                    color: theme.colorScheme.primary,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Adicionar conteúdo',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -138,10 +171,24 @@ class RegisterMemoryView extends StatelessWidget {
                 label: 'Adicionar foto',
                 onImageSelected: state.updateImage,
               ),
-              AddAudioField(
-                label: 'Adicionar áudio',
-                onAudioSelected: state.updateAudio,
-              ),
+             AddAudioField(
+  audioPath: state.audioPath,
+  duration: state.duration,
+  onRecord: () async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return ChangeNotifierProvider.value(
+          value: state,
+          child: const AudioRecorderBottomSheet(),
+        );
+      },
+    );
+  },
+  onRemove: state.removeAudio,
+),
               AddLocationContainer(
                 label: 'Adicionar localização',
                 onLocationSelected: state.updateLocation,
@@ -152,12 +199,17 @@ class RegisterMemoryView extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer.withOpacity(0.35),
+                    color: theme.colorScheme.secondaryContainer.withOpacity(
+                      0.35,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary),
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: theme.colorScheme.primary,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -173,8 +225,12 @@ class RegisterMemoryView extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: state.isSaving ? null : () => state.saveMemory(context),
-                  child: Text(state.isSaving ? 'Salvando...' : 'Salvar lembrança'),
+                  onPressed: state.isSaving
+                      ? null
+                      : () => state.saveMemory(context),
+                  child: Text(
+                    state.isSaving ? 'Salvando...' : 'Salvar lembrança',
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: theme.colorScheme.primary,
