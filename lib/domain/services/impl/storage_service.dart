@@ -129,22 +129,7 @@ class _StorageService implements StorageService {
       rethrow;
     }
   }
-
-  @override
-  Future<List<User>?> listAllUsers() async {
-    try {
-      final db = await _database.database;
-      final List<Map<String, dynamic>> data = await db.query(
-        UserTable.tableName,
-        orderBy: '${UserTable.columnCreatedAt} DESC',
-      );
-      if (data.isEmpty) return null;
-      return data.map((map) => User.fromMap(map)).toList();
-    } on Exception catch (_) {
-      rethrow;
-    }
-  }
-
+  
   @override
   Future<User?> getUserById(int id) async {
     try {
@@ -185,27 +170,6 @@ class _StorageService implements StorageService {
         where: '${UserTable.columnID} = ?',
         whereArgs: [id],
       );
-    } on Exception catch (_) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<int> countUsers() async {
-    try {
-      final db = await _database.database;
-      final result = await db.rawQuery('SELECT COUNT(*) as count FROM ${UserTable.tableName}');
-      return Sqflite.firstIntValue(result) ?? 0;
-    } on Exception catch (_) {
-      rethrow;
-    }
-  }
-
-  @override
-  Future<void> deleteAllUsers() async {
-    try {
-      final db = await _database.database;
-      await db.delete(UserTable.tableName);
     } on Exception catch (_) {
       rethrow;
     }

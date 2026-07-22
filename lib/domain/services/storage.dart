@@ -2,48 +2,39 @@ import 'package:look_back/entities/models/memory.dart';
 import 'package:look_back/entities/models/user.dart';
 
 abstract class StorageService {
-  /// Cria uma nova memória no banco de dados
+  /// Create a new memory in the database returning ID.
   Future<int> createMemory(Memory memory);
 
-  /// Lista todas as memórias
+  /// List all the memories
   Future<List<Memory>?> listAllMemories();
 
-  /// Busca uma memória pelo ID
+  /// Find memory by the id in the database
   Future<Memory?> getMemoryById(int id);
 
-  /// Atualiza uma memória existente
+  /// Update an existing memory in the database
   Future<void> updateMemory(Memory memory);
 
-  /// Deleta uma memória pelo ID
+  /// Deletes the memory by the id in the database
   Future<void> deleteMemory(int id);
 
-  /// Busca memórias por título
+  /// Find memories by title in the database
   Future<List<Memory>?> searchMemoriesByTitle(String title);
 
-  /// Conta o total de memórias
+  /// Count the total of the memories in the database
   Future<int> countMemories();
 
-  /// Limpa todas as memórias do banco de dados
+  /// Delete all the memories in the database
   Future<void> deleteAllMemories();
 
-  /// Cria um novo usuário no banco de dados
+  /// Create a new user in the database returning ID.
   Future<int> createUser(User user);
 
-  /// Lista todos os usuários
-  Future<List<User>?> listAllUsers();
-
-  /// Busca um usuário pelo ID
+  /// Find users by the id in the database
   Future<User?> getUserById(int id);
 
-  /// Atualiza um usuário existente
+  /// Updates the user in the database
   Future<void> updateUser(User user);
 
-  /// Deleta um usuário pelo ID
+  /// Delete the user by the id in the database
   Future<void> deleteUser(int id);
-
-  /// Conta o total de usuários
-  Future<int> countUsers();
-
-  /// Limpa todos os usuários do banco de dados
-  Future<void> deleteAllUsers();
 }
