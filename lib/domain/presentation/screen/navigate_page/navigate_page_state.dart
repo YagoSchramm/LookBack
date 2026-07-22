@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:look_back/domain/presentation/screen/home/home_screen.dart';
-import 'package:look_back/domain/presentation/screen/profile/profile_screen.dart';
+import 'package:look_back/domain/presentation/screen/calendar/calendar_screen.dart';
 import 'package:look_back/domain/presentation/screen/settings/settings_screen.dart';
 
 class NavigatePageState extends ChangeNotifier {
@@ -11,7 +11,7 @@ class NavigatePageState extends ChangeNotifier {
   Widget get currentPage {
     switch (_currentIndex) {
       case 1:
-        return const ProfileScreen();
+        return const CalendarScreen();
       case 2:
         return const SettingsScreen();
       case 0:

@@ -397,9 +397,7 @@ class InitialScreenContent extends StatelessWidget {
                               ],
                             ),
                           ),
- 
-                          // Página 3 — olhar para trás + nome
-                          Padding(
+                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 32),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
