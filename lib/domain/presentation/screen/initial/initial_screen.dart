@@ -35,29 +35,20 @@ class InitialScreenContent extends StatelessWidget {
 
       try {
         final state = context.read<InitialScreenState>();
-        final existingUsers = await storageService.listAllUsers();
         final name = state.nameController.text.trim().isNotEmpty
             ? state.nameController.text.trim()
             : 'Usuário';
         final memoriesCount = await storageService.countMemories();
 
         final user = User(
-          id: existingUsers?.isNotEmpty == true ? existingUsers!.first.id : null,
+          id: null,
           name: name,
           memoriesCount: memoriesCount,
           hasCompletedOnboarding: true,
-          createdAt: existingUsers?.isNotEmpty == true
-              ? existingUsers!.first.createdAt
-              : DateTime.now(),
+          createdAt:  DateTime.now(),
           updatedAt: DateTime.now(),
         );
-
-        if (existingUsers != null && existingUsers.isNotEmpty) {
-          await storageService.updateUser(user);
-        } else {
           await storageService.createUser(user);
-        }
-
         if (context.mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => const HomeScreen()),
