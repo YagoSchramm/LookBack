@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:look_back/domain/services/storage.dart';
 import 'package:look_back/entities/models/memory.dart';
-class CalendarState extends ChangeNotifier {
-  final StorageService _storageService;
+import 'package:look_back/global.dart';
 
-  CalendarState(this._storageService);
+class CalendarState extends ChangeNotifier {
+  CalendarState();
 
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
-  Map<DateTime, List<Memory>> _memoriesByDay = {};
+  List<Memory> _memories = [];
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -18,30 +17,17 @@ class CalendarState extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   /// Memórias do dia atualmente selecionado.
-  List<Memory> get selectedDayMemories =>
-      _memoriesByDay[_normalizeDate(_selectedDay)] ?? [];
+  List<Memory> get selectedDayMemories => memoriesOnDay(_selectedDay);
 
-  DateTime _normalizeDate(DateTime date) =>
-      DateTime(date.year, date.month, date.day);
-
-  /// Carrega todas as memórias do banco e as agrupa por dia.
+  /// Carrega todas as memórias do banco.
   Future<void> loadMemories() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final memories = await _storageService.listAllMemories();
-      final Map<DateTime, List<Memory>> grouped = {};
-
-      if (memories != null) {
-        for (final memory in memories) {
-          final day = _normalizeDate(memory.createdAt);
-          grouped.putIfAbsent(day, () => []).add(memory);
-        }
-      }
-
-      _memoriesByDay = grouped;
+      final memories = await storageService.listAllMemories();
+      _memories = memories ?? [];
     } catch (_) {
       _errorMessage = 'Não foi possível carregar as memórias.';
     } finally {
@@ -62,9 +48,17 @@ class CalendarState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool hasMemoriesOnDay(DateTime day) =>
-      _memoriesByDay.containsKey(_normalizeDate(day));
+  /// Memórias cujo `createdAt` cai no mesmo dia (ano/mês/dia) de [day].
+  List<Memory> memoriesOnDay(DateTime day) {
+    return _memories
+        .where((memory) =>
+            memory.createdAt.year == day.year &&
+            memory.createdAt.month == day.month &&
+            memory.createdAt.day == day.day)
+        .toList();
+  }
 
-  int memoryCountOnDay(DateTime day) =>
-      _memoriesByDay[_normalizeDate(day)]?.length ?? 0;
+  bool hasMemoriesOnDay(DateTime day) => memoriesOnDay(day).isNotEmpty;
+
+  int memoryCountOnDay(DateTime day) => memoriesOnDay(day).length;
 }

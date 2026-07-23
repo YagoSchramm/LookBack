@@ -1,19 +1,32 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:look_back/domain/presentation/screen/calendar/calendar_state.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:look_back/entities/models/memory.dart';
 
-class CalendarScreen extends StatefulWidget {
+class CalendarScreen extends StatelessWidget {
   const CalendarScreen({super.key});
 
   @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => CalendarState(),
+      child: const CalendarScreenContent(),
+    );
+  }
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
+class CalendarScreenContent extends StatefulWidget {
+  const CalendarScreenContent({super.key});
+
+  @override
+  State<CalendarScreenContent> createState() => _CalendarScreenContentState();
+}
+
+class _CalendarScreenContentState extends State<CalendarScreenContent> {
   @override
   void initState() {
     super.initState();
@@ -29,7 +42,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: Text('Calendário de memórias', style: theme.textTheme.titleLarge),
+        title: Text('LookBack', style: theme.textTheme.headlineLarge),
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
       ),
@@ -41,7 +54,87 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
                     children: [
-                      _buildCalendar(theme, state),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          SizedBox(width: 12),
+                          Text(
+                            'Memory calendar',
+                            style: theme.textTheme.headlineSmall,
+                          ),
+                        ],
+                      ),
+                      Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: TableCalendar<Memory>(
+                            firstDay: DateTime(2000, 1, 1),
+                            lastDay: DateTime(2100, 12, 31),
+                            focusedDay: state.focusedDay,
+                            selectedDayPredicate: (day) =>
+                                isSameDay(state.selectedDay, day),
+                            onDaySelected: (selected, focused) {
+                              state.selectDay(selected, focused);
+                            },
+                            onPageChanged: (focused) {
+                              state.changeFocusedDay(focused);
+                            },
+                            locale: 'pt_BR',
+                            calendarFormat: CalendarFormat.month,
+                            availableCalendarFormats: const {
+                              CalendarFormat.month: 'Mês'
+                            },
+                            headerStyle: HeaderStyle(
+                              formatButtonVisible: false,
+                              titleCentered: true,
+                              titleTextStyle:
+                                  theme.textTheme.titleMedium ?? const TextStyle(),
+                              leftChevronIcon: Icon(Icons.chevron_left,
+                                  color: theme.colorScheme.onSurface),
+                              rightChevronIcon: Icon(Icons.chevron_right,
+                                  color: theme.colorScheme.onSurface),
+                            ),
+                            daysOfWeekStyle: DaysOfWeekStyle(
+                              weekdayStyle:
+                                  theme.textTheme.bodySmall ?? const TextStyle(),
+                              weekendStyle: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.primary) ??
+                                  const TextStyle(),
+                            ),
+                            calendarStyle: CalendarStyle(
+                              outsideDaysVisible: false,
+                              defaultTextStyle:
+                                  theme.textTheme.bodyMedium ?? const TextStyle(),
+                              weekendTextStyle: theme.textTheme.bodyMedium
+                                      ?.copyWith(color: theme.colorScheme.primary) ??
+                                  const TextStyle(),
+                              todayDecoration: BoxDecoration(
+                                color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                                shape: BoxShape.circle,
+                              ),
+                              todayTextStyle:
+                                  TextStyle(color: theme.colorScheme.onSurface),
+                              selectedDecoration: BoxDecoration(
+                                color: theme.colorScheme.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              selectedTextStyle:
+                                  TextStyle(color: theme.colorScheme.onPrimary),
+                              markersMaxCount: 1,
+                              markerDecoration: BoxDecoration(
+                                color: theme.colorScheme.secondary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            eventLoader: (day) => state.memoriesOnDay(day),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       if (state.errorMessage != null)
                         Padding(
@@ -52,108 +145,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 ?.copyWith(color: theme.colorScheme.error),
                           ),
                         ),
-                      Expanded(child: _buildMemoryList(theme, state)),
+                      Expanded(
+                        child: state.selectedDayMemories.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(CupertinoIcons.tray,
+                                        size: 48,
+                                        color: theme.colorScheme.onSurfaceVariant),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'Nenhuma memória neste dia',
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(12),
+                                itemCount: state.selectedDayMemories.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                                itemBuilder: (context, index) => _MemoryTile(
+                                  memory: state.selectedDayMemories[index],
+                                  theme: theme,
+                                ),
+                              ),
+                      ),
                     ],
                   ),
           );
         },
       ),
-    );
-  }
-
-  Widget _buildCalendar(ThemeData theme, CalendarState state) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      color: theme.colorScheme.surfaceContainerHighest,
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: TableCalendar<Memory>(
-          firstDay: DateTime(2000, 1, 1),
-          lastDay: DateTime(2100, 12, 31),
-          focusedDay: state.focusedDay,
-          selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
-          onDaySelected: (selected, focused) {
-            state.selectDay(selected, focused);
-          },
-          onPageChanged: (focused) {
-            state.changeFocusedDay(focused);
-          },
-          locale: 'pt_BR',
-          calendarFormat: CalendarFormat.month,
-          availableCalendarFormats: const {CalendarFormat.month: 'Mês'},
-          headerStyle: HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-            titleTextStyle: theme.textTheme.titleMedium ?? const TextStyle(),
-            leftChevronIcon:
-                Icon(Icons.chevron_left, color: theme.colorScheme.onSurface),
-            rightChevronIcon:
-                Icon(Icons.chevron_right, color: theme.colorScheme.onSurface),
-          ),
-          daysOfWeekStyle: DaysOfWeekStyle(
-            weekdayStyle: theme.textTheme.bodySmall ?? const TextStyle(),
-            weekendStyle: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.primary) ??
-                const TextStyle(),
-          ),
-          calendarStyle: CalendarStyle(
-            outsideDaysVisible: false,
-            defaultTextStyle: theme.textTheme.bodyMedium ?? const TextStyle(),
-            weekendTextStyle: theme.textTheme.bodyMedium
-                    ?.copyWith(color: theme.colorScheme.primary) ??
-                const TextStyle(),
-            todayDecoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              shape: BoxShape.circle,
-            ),
-            todayTextStyle: TextStyle(color: theme.colorScheme.onSurface),
-            selectedDecoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-            selectedTextStyle: TextStyle(color: theme.colorScheme.onPrimary),
-            markersMaxCount: 1,
-            markerDecoration: BoxDecoration(
-              color: theme.colorScheme.secondary,
-              shape: BoxShape.circle,
-            ),
-          ),
-          eventLoader: (day) =>state.selectedDayMemories,
-            
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMemoryList(ThemeData theme, CalendarState state) {
-    final memories = state.selectedDayMemories;
-
-    if (memories.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.photo_album_outlined,
-                size: 48, color: theme.colorScheme.onSurfaceVariant),
-            const SizedBox(height: 12),
-            Text(
-              'Nenhuma memória neste dia',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(12),
-      itemCount: memories.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, index) =>
-          _MemoryTile(memory: memories[index], theme: theme),
     );
   }
 }
