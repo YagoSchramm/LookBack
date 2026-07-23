@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:look_back/app_state.dart';
 import 'package:look_back/domain/presentation/app_theme.dart';
 import 'package:look_back/domain/presentation/screen/navigate_page/navigate_page_screen.dart';
@@ -6,7 +7,8 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MultiProvider(
+    await initializeDateFormatting('pt_BR', null);
+    runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => AppState()..loadTheme()),
     ],
