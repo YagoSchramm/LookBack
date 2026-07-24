@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:look_back/domain/presentation/components/app_snackbar.dart';
+import 'package:look_back/entities/models/memory.dart';
 import 'package:look_back/global.dart';
 
 class RegisterMemoryState extends ChangeNotifier {
@@ -40,29 +42,57 @@ class RegisterMemoryState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Tenta interpretar [selectedLocation] no formato "latitude,longitude".
+  /// Retorna null se o texto não estiver nesse formato.
+  ({double latitude, double longitude})? _parseLocation(String? location) {
+    if (location == null) return null;
+
+    final parts = location.split(',');
+    if (parts.length != 2) return null;
+
+    final latitude = double.tryParse(parts[0].trim());
+    final longitude = double.tryParse(parts[1].trim());
+    if (latitude == null || longitude == null) return null;
+
+    return (latitude: latitude, longitude: longitude);
+  }
+
   Future<void> saveMemory(BuildContext context) async {
     if (titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Adicione um título para a sua lembrança.')),
-      );
+      AppSnackBar.showError(context, 'Adicione um título para a sua lembrança.');
       return;
     }
 
     setSaving(true);
-    await Future<void>.delayed(const Duration(milliseconds: 600));
 
-    if (!context.mounted) return;
+    try {
+      final resolvedAudioPath = _audioPath ?? selectedAudio?.path;
+      final coordinates = _parseLocation(selectedLocation);
 
-    setSaving(false);
+      final memory = Memory(
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
+        imagePath: selectedImage?.path,
+        audioPath: resolvedAudioPath,
+        latitude: coordinates?.latitude,
+        longitude: coordinates?.longitude,
+        createdAt: DateTime.now(),
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Lembrança criada com sucesso!')),
-    );
+      await storageService.createMemory(memory);
 
-    Navigator.of(context).maybePop();
+      if (!context.mounted) return;
+
+      AppSnackBar.showSuccess(context, 'Lembrança criada com sucesso!');
+
+      Navigator.of(context).maybePop();
+    } catch (_) {
+      if (!context.mounted) return;
+      AppSnackBar.showError(context, 'Não foi possível salvar a lembrança.');
+    } finally {
+      setSaving(false);
+    }
   }
-
-
 
   bool _isRecording = false;
 
@@ -125,7 +155,6 @@ class RegisterMemoryState extends ChangeNotifier {
     _timer?.cancel();
 
     _audioPath = null;
-
     _duration = Duration.zero;
 
     _isRecording = false;
@@ -139,11 +168,12 @@ class RegisterMemoryState extends ChangeNotifier {
 
     notifyListeners();
   }
+
   @override
   void dispose() {
     titleController.dispose();
     descriptionController.dispose();
-     _timer?.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 }
