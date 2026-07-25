@@ -1,69 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:look_back/domain/presentation/components/memory_cards/audio_memory_card.dart';
-import 'package:look_back/domain/presentation/components/memory_cards/image_memory_card.dart';
-import 'package:look_back/domain/presentation/components/memory_cards/location_memory_card.dart';
-import 'package:look_back/domain/presentation/components/memory_cards/text_memory_card.dart';
 import 'package:look_back/domain/presentation/screen/home/home_state.dart';
 import 'package:look_back/domain/presentation/screen/register_memory/register_memory_screen.dart';
-import 'package:look_back/entities/models/memory.dart';
 import 'package:provider/provider.dart';
-
-const _monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-String _timeLabel(DateTime dateTime) {
-  final hour24 = dateTime.hour;
-  final period = hour24 >= 12 ? 'PM' : 'AM';
-  final hour12 = hour24 % 12 == 0 ? 12 : hour24 % 12;
-  final minute = dateTime.minute.toString().padLeft(2, '0');
-  return '$hour12:$minute $period';
-}
-
-String _greeting(DateTime now) {
-  if (now.hour < 12) return 'Good morning';
-  if (now.hour < 18) return 'Good afternoon';
-  return 'Good evening';
-}
-
-Widget _memoryCard(Memory memory) {
-  final time = _timeLabel(memory.createdAt);
-
-  if (memory.imagePath != null && memory.imagePath!.isNotEmpty) {
-    return ImageMemoryCard(
-      imagePath: memory.imagePath!,
-      description: memory.description,
-      time: time,
-    );
-  }
-
-  if (memory.audioPath != null && memory.audioPath!.isNotEmpty) {
-    return AudioMemoryCard(
-      time: time,
-      onTap: () {
-      },
-    );
-  }
-
-  if (memory.latitude != null && memory.longitude != null) {
-    return LocationMemoryCard(
-      latitude: memory.latitude!,
-      longitude: memory.longitude!,
-      locationName: memory.description,
-      time: time,
-      onTap: () {
-      },
-    );
-  }
-
-  return TextMemoryCard(
-    text: memory.title,
-    time: time,
-    onTap: () {
-    },
-  );
-}
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -124,7 +62,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${_greeting(now)}, User!',
+                      '${state.greeting(now)}, User!',
                       style: theme.textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: theme.colorScheme.onSurface,
@@ -168,39 +106,32 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color:
-                                        theme.colorScheme.shadow.withOpacity(0.05),
+                                    color: theme.colorScheme.shadow.withOpacity(0.05),
                                     blurRadius: 10,
                                     offset: const Offset(0, 3),
                                   ),
                                 ],
                               ),
-                              child: Row(
-                                children: [
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${state.streakDays}',
-                                          style: theme.textTheme.titleLarge
-                                              ?.copyWith(fontWeight: FontWeight.w700),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Days streak',
-                                          style: theme.textTheme.bodyMedium?.copyWith(
-                                            color: theme.colorScheme.onSurface
-                                                .withOpacity(0.7),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                      ],
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${state.streakDays}',
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Days streak',
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -218,39 +149,32 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color:
-                                        theme.colorScheme.shadow.withOpacity(0.05),
+                                    color: theme.colorScheme.shadow.withOpacity(0.05),
                                     blurRadius: 10,
                                     offset: const Offset(0, 3),
                                   ),
                                 ],
                               ),
-                              child: Row(
-                                children: [
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${state.memoriesCount}',
-                                          style: theme.textTheme.titleLarge
-                                              ?.copyWith(fontWeight: FontWeight.w700),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Memories',
-                                          style: theme.textTheme.bodyMedium?.copyWith(
-                                            color: theme.colorScheme.onSurface
-                                                .withOpacity(0.7),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                      ],
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${state.memoriesCount}',
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Memories',
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -267,10 +191,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                         },
                         child: Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 18,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary,
                             borderRadius: BorderRadius.circular(12),
@@ -288,8 +209,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                 width: 48,
                                 height: 48,
                                 decoration: BoxDecoration(
-                                  color:
-                                      theme.colorScheme.onPrimary.withOpacity(0.15),
+                                  color: theme.colorScheme.onPrimary.withOpacity(0.15),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -314,8 +234,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                     Text(
                                       'Save your moments now',
                                       style: theme.textTheme.bodyMedium?.copyWith(
-                                        color: theme.colorScheme.onPrimary
-                                            .withOpacity(0.85),
+                                        color: theme.colorScheme.onPrimary.withOpacity(0.85),
                                       ),
                                     ),
                                   ],
@@ -334,7 +253,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                       Row(
                         children: [
                           Text(
-                            'Today, ${now.day} ${_monthNames[now.month - 1]}',
+                            'Today, ${now.day} ${monthNames[now.month - 1]}',
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.w600,
@@ -364,7 +283,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                         )
                       else
                         for (final memory in state.todaysMemories) ...[
-                          _memoryCard(memory),
+                          state.memoryCard(memory),
                           const SizedBox(height: 12),
                         ],
                     ],
