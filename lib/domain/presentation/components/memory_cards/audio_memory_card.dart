@@ -1,13 +1,84 @@
-import 'package:flutter/cupertino.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:look_back/entities/models/memory.dart';
 import 'package:look_back/utils/date_formatter.dart';
 
-class AudioMemoryCard extends StatelessWidget {
-  const AudioMemoryCard({super.key, required this.memory, this.onPlay});
+class AudioMemoryCard extends StatefulWidget {
+  const AudioMemoryCard({super.key, required this.memory});
 
   final Memory memory;
-  final VoidCallback? onPlay;
+
+  @override
+  State<AudioMemoryCard> createState() => _AudioMemoryCardState();
+}
+
+class _AudioMemoryCardState extends State<AudioMemoryCard> {
+  late final PlayerController _playerController;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _playerController = PlayerController();
+    _initPlayer();
+  }
+
+  Future<void> _initPlayer() async {
+    try {
+      await _playerController.preparePlayer(
+        path: widget.memory.audioPath!,
+        shouldExtractWaveform: true,
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _togglePlayback() async {
+    if (_playerController.playerState.isPlaying) {
+      await _playerController.pausePlayer();
+    } else {
+      await _playerController.startPlayer();
+    }
+  }
+
+  @override
+  void dispose() {
+    _playerController.dispose();
+    super.dispose();
+  }
+
+  Widget _waveform(BuildContext context, {required double height}) {
+    final theme = Theme.of(context);
+
+    if (_isLoading) {
+      return SizedBox(
+        height: height,
+        child: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return AudioFileWaveforms(
+      size: Size(double.infinity, height),
+      playerController: _playerController,
+      waveformType: WaveformType.fitWidth,
+      playerWaveStyle: PlayerWaveStyle(
+        fixedWaveColor: theme.colorScheme.primary.withOpacity(0.3),
+        liveWaveColor: theme.colorScheme.primary,
+        spacing: 6,
+        waveThickness: 3,
+      ),
+    );
+  }
 
   void _showOverlay(BuildContext context) {
     final theme = Theme.of(context);
@@ -43,50 +114,59 @@ class AudioMemoryCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          minSize: 0,
-                          onPressed: onPlay,
-                          child: Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.play_arrow_rounded,
-                              color: theme.colorScheme.onPrimary,
-                              size: 32,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          formatTime(memory.createdAt),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
                     Text(
-                      memory.title,
+                      widget.memory.title,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      memory.description,
+                      widget.memory.description,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurface.withOpacity(0.75),
                         height: 1.5,
                       ),
+                    ),
+                    const SizedBox(height: 20),
+                    _waveform(context, height: 80),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        StreamBuilder<PlayerState>(
+                          stream: _playerController.onPlayerStateChanged,
+                          builder: (context, snapshot) {
+                            final isPlaying =
+                                snapshot.data?.isPlaying ?? false;
+                            return GestureDetector(
+                              onTap: _togglePlayback,
+                              child: Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  isPlaying
+                                      ? Icons.pause_rounded
+                                      : Icons.play_arrow_rounded,
+                                  color: theme.colorScheme.onPrimary,
+                                  size: 30,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          formatTime(widget.memory.createdAt),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -127,60 +207,35 @@ class AudioMemoryCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              minSize: 0,
-              onPressed: onPlay,
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  color: theme.colorScheme.onPrimary,
-                  size: 32,
-                ),
-              ),
+            StreamBuilder<PlayerState>(
+              stream: _playerController.onPlayerStateChanged,
+              builder: (context, snapshot) {
+                final isPlaying = snapshot.data?.isPlaying ?? false;
+                return GestureDetector(
+                  onTap: _togglePlayback,
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isPlaying
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      color: theme.colorScheme.onPrimary,
+                      size: 32,
+                    ),
+                  ),
+                );
+              },
             ),
             const SizedBox(width: 18),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    for (final height in [
-                      10.0,
-                      16.0,
-                      24.0,
-                      32.0,
-                      40.0,
-                      48.0,
-                      40.0,
-                      32.0,
-                      24.0,
-                      16.0,
-                      10.0,
-                    ])
-                      Container(
-                        width: 4,
-                        height: height,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
+            Expanded(child: _waveform(context, height: 48)),
             const SizedBox(width: 18),
             Text(
-              formatTime(memory.createdAt),
+              formatTime(widget.memory.createdAt),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
                 fontWeight: FontWeight.w600,
