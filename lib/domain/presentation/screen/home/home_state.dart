@@ -27,11 +27,7 @@ class HomeState extends ChangeNotifier {
     if (_memories.isEmpty) return 0;
 
     final daysWithMemory = _memories
-        .map((memory) => DateTime(
-              memory.createdAt.year,
-              memory.createdAt.month,
-              memory.createdAt.day,
-            ))
+        .map((m) => DateTime(m.createdAt.year, m.createdAt.month, m.createdAt.day))
         .toSet();
 
     var cursor = DateTime.now();
@@ -45,14 +41,43 @@ class HomeState extends ChangeNotifier {
     return streak;
   }
 
-  List<Memory> get todaysMemories {
+  // Retorna um map ordenado do dia mais recente pro mais antigo.
+  // A chave é o DateTime zerado (só dia/mês/ano) e o valor é a lista de memórias daquele dia.
+  Map<DateTime, List<Memory>> get memoriesByDay {
     final now = DateTime.now();
-    return _memories
-        .where((memory) =>
-            memory.createdAt.year == now.year &&
-            memory.createdAt.month == now.month &&
-            memory.createdAt.day == now.day)
-        .toList();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final result = <DateTime, List<Memory>>{};
+
+    // Inicializa os 6 dias (hoje + 5 anteriores) para garantir a ordem
+    for (var i = 0; i < 6; i++) {
+      final day = today.subtract(Duration(days: i));
+      result[day] = [];
+    }
+
+    for (final memory in _memories) {
+      final day = DateTime(
+        memory.createdAt.year,
+        memory.createdAt.month,
+        memory.createdAt.day,
+      );
+      // Só adiciona se o dia estiver dentro da janela dos 6 dias
+      if (result.containsKey(day)) {
+        result[day]!.add(memory);
+      }
+    }
+
+    return result;
+  }
+
+  String dayLabel(DateTime day) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    if (day == today) return 'Today, ${day.day} ${monthNames[day.month - 1]}';
+    if (day == yesterday) return 'Yesterday, ${day.day} ${monthNames[day.month - 1]}';
+    return '${day.day} ${monthNames[day.month - 1]}';
   }
 
   String greeting(DateTime now) {
@@ -61,24 +86,24 @@ class HomeState extends ChangeNotifier {
     return 'Good evening';
   }
 
- Widget memoryCard(Memory memory) {
-  if (memory.imagePath != null && memory.imagePath!.isNotEmpty) {
-    return ImageMemoryCard(
-      memory: memory,
-      isFromGallery: memory.imagePath!.startsWith('/'),
-    );
-  }
+  Widget memoryCard(Memory memory) {
+    if (memory.imagePath != null && memory.imagePath!.isNotEmpty) {
+      return ImageMemoryCard(
+        memory: memory,
+        isFromGallery: memory.imagePath!.startsWith('/'),
+      );
+    }
 
-  if (memory.audioPath != null && memory.audioPath!.isNotEmpty) {
-    return AudioMemoryCard(memory: memory);
-  }
+    if (memory.audioPath != null && memory.audioPath!.isNotEmpty) {
+      return AudioMemoryCard(memory: memory);
+    }
 
-  if (memory.latitude != null && memory.longitude != null) {
-    return LocationMemoryCard(memory: memory);
-  }
+    if (memory.latitude != null && memory.longitude != null) {
+      return LocationMemoryCard(memory: memory);
+    }
 
-  return TextMemoryCard(memory: memory);
-}
+    return TextMemoryCard(memory: memory);
+  }
 
   Future<void> loadMemories() async {
     _isLoading = true;

@@ -250,42 +250,45 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Text(
-                            'Today, ${now.day} ${monthNames[now.month - 1]}',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
-                              color: theme.colorScheme.onSurface.withOpacity(0.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (state.todaysMemories.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 24),
-                          child: Center(
-                            child: Text(
-                              'Nenhuma memória hoje ainda',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface.withOpacity(0.6),
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        for (final memory in state.todaysMemories) ...[
-                          state.memoryCard(memory),
-                          const SizedBox(height: 12),
-                        ],
+         for (final entry in state.memoriesByDay.entries) ...[
+  Row(
+    children: [
+      Text(
+        state.dayLabel(entry.key),
+        style: theme.textTheme.bodyLarge?.copyWith(
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Divider(
+          thickness: 1,
+          color: theme.colorScheme.onSurface.withOpacity(0.5),
+        ),
+      ),
+    ],
+  ),
+  const SizedBox(height: 12),
+  if (entry.value.isEmpty)
+    Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Center(
+        child: Text(
+          'Nenhuma memória neste dia',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.6),
+          ),
+        ),
+      ),
+    )
+  else
+    for (final memory in entry.value) ...[
+      state.memoryCard(memory),
+      const SizedBox(height: 12),
+    ],
+  const SizedBox(height: 8),
+],
                     ],
                   ],
                 ),
